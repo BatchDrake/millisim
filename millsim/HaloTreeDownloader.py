@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from millsim import DataDownloader
+from millsim.constants import *
 
 class HaloTreeDownloader(DataDownloader.DataDownloader):
     def __init__(self, min_mass = 1e11, max_mass = 1e12):
@@ -69,8 +70,7 @@ class HaloTreeDownloader(DataDownloader.DataDownloader):
                select top {0} haloId from millimil..MPAHalo 
                where 
                    snapnum = 63 
-                   and m_Crit200 between {1}/0.73e10 
-                   and {2}/0.73e10 
+                   and m_Crit200 between {1}/{3}e10 and {2}/{3}e10 
                    and random between 0 and 100)                                                                    
             and PROG.haloId between DES.haloId and DES.lastProgenitorId 
         group by DES.haloId;                      
@@ -78,21 +78,52 @@ class HaloTreeDownloader(DataDownloader.DataDownloader):
         -- Hacer la búsqueda directamente en un JOIN                     
         select                         
             DES.haloId as finalHaloId,
-            PROG.haloId,
-            PROG.m_Crit200*0.73e10 as Msun,
-            PROG.snapnum    
-              into #haloEvolution   
+            PROG.haloId as intHaloId,
+            PROG.m_Crit200*{3}e10 as Msun,
+            PROG.snapnum as snpnr  
+        into #haloEvolution   
         from millimil..MPAHalo PROG, millimil..MPAHalo DES         
-        inner join #mainBranches as mb on (mb.haloId = DES.haloId)                                 
+        inner join #mainBranches as mb on (mb.haloId = DES.haloId)
         where                                           
            PROG.haloId between DES.haloId and mb.mainLeafId;   
-   
+        
+        -- Extract galaxies in each halo along with their stelar masses
+        select
+            intHaloId,
+            galaxyID,
+            stellarMass,
+            coldGas,
+            hotGas
+        into #galaxyMasses
+        from #haloEvolution
+        left outer join millimil..DeLucia2006a as galaxies on (galaxies.haloID = intHaloId);
+        
+        -- Compute halo stellar masses by summing the masses of each individual galaxy
+        select
+            intHaloId,
+            sum(stellarMass)*{3}e10 as stellarMsun,
+            sum(coldGas + hotGas)*{3}e10 as gasMsun
+        into #haloStarMasses
+        from #galaxyMasses
+        group by intHaloId;
+        
+        -- Append this information to haloEvolution and call it starMassEvolution
+        select
+            #haloEvolution.*,
+            stellarMsun,
+            gasMsun,
+            stellarMsun + gasMsun as baryonMsun,
+            (stellarMsun + gasMsun) / (Msun + 1) as baryonMassFraction
+        into #starMassEvolution
+        from #haloEvolution
+        inner join #haloStarMasses on (#haloStarMasses.intHaloId = #haloEvolution.intHaloId);
+        
         -- Join de la evolución de los halos con la información del redshift
-        select * from #haloEvolution 
+        select * from #starMassEvolution 
         inner join 
             millimil..snapshots as snp 
-            on (snp.snapnum = #haloEvolution.snapnum);
-        """.format(self.count, self.min_mass, self.max_mass)
+    on (snp.snapnum = #starMassEvolution.snpnr);
+        """.format(self.count, self.min_mass, self.max_mass, MILLSIM_h)
         self.set_query(self.query)
     
     def set_mass_range(self, min_mass, max_mass):

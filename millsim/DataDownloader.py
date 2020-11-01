@@ -67,7 +67,7 @@ class DataDownloader:
         self.rows = []
         
         if len(self.csv) < 1:
-            raise Exception("Missing column information (bad query?)")
+            raise Exception("Missing column information (bad query?). See cache file " + self.queryHash + ".csv for details.")
         
         for name in self.csv[0]:
             self.column_names.append(name)
