@@ -3,4 +3,4 @@
 MILLSIM_TIMESTEPS = 64       # According to documentation
 MILLSIM_h = 0.73             # According to documentation
 MILLSIM_H0 = MILLSIM_h * 100 # As h is given in hundreds of km/s/Mpc
-  
+MILLSIM_OVERCOLOR = 2        # Overcoloring in B-V representations

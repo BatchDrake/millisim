@@ -1,7 +1,7 @@
 from common import *
 
-from millsim.HaloTreeDownloader import *
-from millsim.HaloPlotter import *
+from millsim.HaloTreeDownloader import HaloTreeDownloader
+from millsim.HaloPlotter import HaloPlotter
 
 dl     = HaloTreeDownloader()
 legend = []
@@ -31,4 +31,3 @@ for i in HALO_MASS_RANGES:
         
 plt.legend(legend)
 plt.show()
-    

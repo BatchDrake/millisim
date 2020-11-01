@@ -1,7 +1,7 @@
 from common import *
 
-from millsim.HaloTreeDownloader import *
-from millsim.HaloPlotter import *
+from millsim.HaloTreeDownloader import HaloTreeDownloader
+from millsim.HaloPlotter import HaloPlotter
 
 dl = HaloTreeDownloader()
 dl.set_count(HALO_COUNT)

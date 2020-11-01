@@ -27,3 +27,8 @@ def bv2rgb(bv):
             piecewise_interp(bv, BV_RANGES_GREEN, BV_POLIES_GREEN, 0), \
             piecewise_interp(bv, BV_RANGES_BLUE,  BV_POLIES_BLUE, 0))
     
+def rgb2html(rgb):
+    r = int(rgb[0] * 255.)
+    g = int(rgb[1] * 255.)
+    b = int(rgb[2] * 255.)
+    return '#{0:02x}{1:02x}{2:02x}'.format(r, g, b)

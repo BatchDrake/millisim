@@ -3,7 +3,7 @@
 from matplotlib import pyplot as plt
 import numpy as np 
 from millsim import Plotter
-from millsim.constants import *
+from millsim.constants import MILLSIM_TIMESTEPS
 
 class HaloPlotter(Plotter.Plotter):
     def __init__(self, halos, massColumn = "Msun"):

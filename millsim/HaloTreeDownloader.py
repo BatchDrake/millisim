@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from millsim import DataDownloader
-from millsim.constants import *
+from millsim.constants import MILLSIM_h
 
 class HaloTreeDownloader(DataDownloader.DataDownloader):
     def __init__(self, min_mass = 1e11, max_mass = 1e12):
