@@ -16,6 +16,10 @@ class GalaxyPlotter(Plotter.Plotter):
     
     def nodeName(self, gId):
         return "galaxy_{0}".format(int(gId))
+
+    def galaxyIsValid(self, gId, ndx):
+        ret = self.galaxyMass[gId][ndx] > 1
+        return ret
     
     def plotGalaxyTree(self, fig, gId):
         plt.figure(fig)
@@ -27,32 +31,33 @@ class GalaxyPlotter(Plotter.Plotter):
         
         # Add nodes
         for ndx, i in enumerate(self.galaxyEdges[gId]):
-            child  = self.nodeName(i[0])
-            color = rgb2html(bv2rgb(MILLSIM_OVERCOLOR * self.galaxyBV[gId][ndx]))
-            logsz = (np.log10(1 + self.galaxyMass[gId][ndx]) - 6)
-            
-            if logsz < 0:
-                logsz = 0
+            if self.galaxyIsValid(gId, ndx):
+                child  = self.nodeName(i[0])
+                color = rgb2html(bv2rgb(MILLSIM_OVERCOLOR * self.galaxyBV[gId][ndx]))
+                logsz = (np.log10(1 + self.galaxyMass[gId][ndx]) - 5)
                 
-            node_size.append(10 * logsz * logsz)
-            node_color.append(color)
-            G.add_node(child, back_color=color)
-        
+                if logsz < 2:
+                    logsz = 2
+                    
+                node_size.append(10 * logsz * logsz)
+                node_color.append(color)
+                G.add_node(child, back_color=color)
+
         # Add edges (in black, of course)
-        for i in self.galaxyEdges[gId]:
-            if int(i[1]) >= 0:
+        for ndx, i in enumerate(self.galaxyEdges[gId]):
+            if self.galaxyIsValid(gId, ndx) and int(i[1]) >= 0:
                 child  = self.nodeName(i[0])
                 parent = self.nodeName(i[1])
                 edge_color.append('k')
                 G.add_edge(child, parent)
-                
 
         # Oh my God, networkx is so broken
         pos = graphviz_layout(G, prog = 'dot')
         for ndx, i in enumerate(self.galaxyEdges[gId]):
-            child  = self.nodeName(i[0])
-            pos[child] = (pos[child][0], self.galaxyLBTime[gId][ndx])
-        
+            if self.galaxyIsValid(gId, ndx):
+                child  = self.nodeName(i[0])
+                pos[child] = (pos[child][0], self.galaxyLBTime[gId][ndx])
+
         nx.draw_networkx(               \
             G,                          \
             pos,                        \
@@ -78,14 +83,12 @@ class GalaxyPlotter(Plotter.Plotter):
         
     def processGalaxies(self, galaxies):
         self.galaxyMass    = {}
-        self.galaxyZ       = {}
         self.galaxyBV      = {}
         self.galaxyEdges   = {}
         self.galaxySnapNrs = {}
         self.galaxyLBTime  = {}
         # Convert galaxies to a dictionary of vectors
         for galaxyId in galaxies:
-            Z         = np.array(galaxies[galaxyId]["Z"])
             masses    = np.array(galaxies[galaxyId]["stellarMsun"])
             bv        = np.array(galaxies[galaxyId]["B_V"])
             lbTime    = np.array(galaxies[galaxyId]["lookbackTime"])
@@ -97,7 +100,6 @@ class GalaxyPlotter(Plotter.Plotter):
                 
             self.galaxyEdges[galaxyId]   = edges
             self.galaxyMass[galaxyId]    = masses
-            self.galaxyZ[galaxyId]       = Z
             self.galaxyBV[galaxyId]      = bv
             self.galaxySnapNrs[galaxyId] = snapNums
             self.galaxyLBTime[galaxyId]  = lbTime

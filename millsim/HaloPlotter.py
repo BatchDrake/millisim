@@ -4,19 +4,21 @@ from matplotlib import pyplot as plt
 import numpy as np 
 from millsim import Plotter
 from millsim.constants import MILLSIM_TIMESTEPS
+from millsim.TimeAxisDownloader import TimeAxisDownloader
 
 class HaloPlotter(Plotter.Plotter):
     def __init__(self, halos, massColumn = "Msun"):
         Plotter.Plotter.__init__(self)
         self.massColumn = massColumn
         self.processHalos(halos)
-    
+        self.timeAxis = TimeAxisDownloader()
+        
     def plotHalos(self, fig, title="Dark matter halo masses"):
         plt.figure(fig)
         self.ax.grid()
         
         for haloId in self.haloMass:
-            z = self.haloZ[haloId] 
+            z = self.timeAxis.getTimeAxis()
             m = self.haloMass[haloId]
         
             self.ax.set_title(title) 
@@ -30,7 +32,7 @@ class HaloPlotter(Plotter.Plotter):
         plt.figure(fig)
         plt.grid(True)
         
-        z = list(self.haloZ.values())[0]
+        z = self.timeAxis.getTimeAxis()
         m = self.haloMassMean
         mErr = self.haloMassStd
         
@@ -51,23 +53,20 @@ class HaloPlotter(Plotter.Plotter):
         
     def processHalos(self, halos):
         self.haloMass = {}
-        self.haloZ    = {}
         
         # Convert halos to a dictionary of vectors
         for haloId in halos:
-            Z         = np.array(halos[haloId]["Z"])
             masses    = np.array(halos[haloId][self.massColumn])
             snapNums  = np.array(halos[haloId]["snpnr"]).astype(int)
+
+            if masses[0] < 1:
+                continue
             
             self.haloMass[haloId] = np.zeros(MILLSIM_TIMESTEPS)
-            self.haloZ[haloId]  = np.zeros(MILLSIM_TIMESTEPS)
-            
             self.haloMass[haloId][snapNums] = np.array(masses)
-            self.haloZ[haloId][snapNums]    = np.array(Z)
             
         # Remove nulls
-        self.sanitizeNulls(self.haloMass)
-        self.sanitizeNulls(self.haloZ, [MILLSIM_TIMESTEPS - 1])
+        self.sanitizeNulls(self.haloMass, hold = True)
         
         # Compute halo mass mean and standard deviation
         haloMassMatrix = np.array(list(self.haloMass.values()))

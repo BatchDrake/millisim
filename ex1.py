@@ -23,13 +23,13 @@ for i in HALO_MASS_RANGES:
         plotter.set_axes(axes[0])
         plotter.plotHalos(\
             figno, \
-            "Halo DM mass evolution ({0} $M_\odot$ to {1} $M_\odot$)".format(\
+            "Halo DM mass evol. ({0} $M_\odot$ - {1} $M_\odot$)".format(\
                 plotter.quantityToLatex(i[0]), plotter.quantityToLatex(i[1])))
         
         plotter.set_axes(axes[1])
         plotter.plotHaloMean(\
             figno, \
-            "Halo DM mass evolution (mean, {0} $M_\odot$ to {1} $M_\odot$)".format(\
+            "Halo DM mass evol. (mean)".format(\
             plotter.quantityToLatex(i[0]), plotter.quantityToLatex(i[1])),\
             True)
 
