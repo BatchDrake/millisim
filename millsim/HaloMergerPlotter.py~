@@ -20,25 +20,7 @@ class GalaxyPlotter(Plotter.Plotter):
     def galaxyIsValid(self, gId, ndx):
         ret = self.galaxyMass[gId][ndx] > 1
         return ret
-
-    def plotMags(self, fig):
-        plt.figure(fig)
-        fig, ax = plt.subplots()
-
-        ax = fig.add_subplot(111)
-        for i in np.arange(-.4, 2.1, .25):
-            y = i * 10
-            x = 0
-
-            circle = plt.Circle((x, y), radius = 1, facecolor = rgb2html(bv2rgb(i)), edgecolor = 'black')
-            ax.add_patch(circle)
-
-            label = ax.annotate("{0:g}".format(i), xy = (x, y), fontsize = 8, ha = "center", va = "center")
-
-            ax.axis('off')
-            ax.set_aspect('equal')
-            ax.autoscale_view()
-
+    
     def plotGalaxyTree(self, fig, gId):
         plt.figure(fig)
         G = nx.DiGraph()

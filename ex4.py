@@ -30,4 +30,7 @@ for rang in GALAXY_MASS_RANGES:
         print("error: " + str(e))
         traceback.print_last()
 
+plotter = GalaxyPlotter(galaxies)
+plotter.plotMags(figno)
+
 plt.show()

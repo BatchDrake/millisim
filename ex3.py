@@ -19,17 +19,17 @@ for i in HALO_MASS_RANGES:
         print("OK: {0} rows, {1} halos".format(dl.row_count(), len(halos)))
         
         fig, axes = plt.subplots(1, 2)
-        plotter = HaloPlotter(halos, "stellarMsun")
+        plotter = HaloPlotter(halos, "baryonMsun")
         plotter.set_axes(axes[0])
         plotter.plotHalos(\
             figno, \
-            "Halo star mass evol. (DM masses from {0} $M_\odot$ to {1} $M_\odot$)".format(\
+            "Halo baryon mass evol. (DM masses from {0} $M_\odot$ to {1} $M_\odot$)".format(\
                 plotter.quantityToLatex(i[0]), plotter.quantityToLatex(i[1])))
         
         plotter.set_axes(axes[1])
         plotter.plotHaloMean(\
             figno, \
-            "Halo star mass evol. (mean)".format(\
+            "Halo baryon mass evol. (mean)".format(\
             plotter.quantityToLatex(i[0]), plotter.quantityToLatex(i[1])),\
             True)
 

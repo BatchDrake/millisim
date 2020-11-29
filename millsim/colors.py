@@ -26,7 +26,7 @@ def bv2rgb(bv):
     return (piecewise_interp(bv, BV_RANGES_RED,   BV_POLIES_RED, 0),   \
             piecewise_interp(bv, BV_RANGES_GREEN, BV_POLIES_GREEN, 0), \
             piecewise_interp(bv, BV_RANGES_BLUE,  BV_POLIES_BLUE, 0))
-    
+
 def rgb2html(rgb):
     r = int(rgb[0] * 255.)
     g = int(rgb[1] * 255.)
